@@ -1,0 +1,25 @@
+# [Optional] Notifier默认的通知周期
+default_interval_minutes: 240
+# [Optional] 数据库类型，优先级高于环境变量中的DATABASE_TYPE
+db_provider: sqlite
+# [Optional] 数据库连接地址，优先级高于环境变量中的DATABASE_URL
+db_url: /app/data/wewe-rss.db
+# [Required] Notifiers配置项
+notifiers:
+  # [Required] 要使用的Notifier类
+- cls: FeishuNotifier
+  # [Optional] 服务启动发送测试消息时，用于确认连通性的Notifier名称，缺省则为cls同名
+  name: feishu1
+  # [Optional] 本Notifier使用的通知间隔，优先级高于 default_interval_minutes
+  interval_minutes: 10
+  # [Required] Notifier特定参数
+  fs_token: xxxx
+- cls: FeishuNotifier
+  # name: feishu2
+  interval_minutes: 60
+  fs_token: yyyy
+- cls: DingtalkNotifier
+  name: dingtalk1
+  access_token: xxxx
+  secret: xxxx
+  # interval_minutes: 60

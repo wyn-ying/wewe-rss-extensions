@@ -1,0 +1,10 @@
+.git
+.gitignore
+*.md
+*.yml
+data
+docs
+token
+release*
+.DS_Store
+__pycache__
