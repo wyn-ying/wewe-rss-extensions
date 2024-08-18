@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Author: Wyn
-# Time: 2024-07-28 14:36:32
+# Author: wyn
+# Time: 2024-08-18 19:21:04
 
-import mysql.connector
+from typing import Union
 from urllib.parse import urlparse
+from model.conf import logger
+import mysql.connector
 import sqlite3
-import logging
-import sys
-
-fmt = '%(asctime)s %(levelname)s %(filename)s %(funcName)s[%(lineno)d] %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=fmt)
-logger = logging.getLogger(__name__)
 
 
 class DbFetcher:
@@ -106,3 +102,13 @@ class DbFetcher:
                 "mp_name": r[5]
             } for r in results]
         return data
+
+
+def get_fetcher(conf: dict) -> Union[DbFetcher, None]:
+    provider = conf['db_provider']
+    if provider not in ('mysql', 'sqlite'):
+        logger.warning('EXIT NOTIFIER: config of "db_provider" should be in ("mysql", "sqlite")')
+        return None
+    url = conf['db_url']
+    db_fetcher = DbFetcher(provider, url)
+    return db_fetcher

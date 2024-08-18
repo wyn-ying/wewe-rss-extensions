@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wewe Rss Extension Manager</title>
+    <script src="/static/js/index.js"></script>
+</head>
+<body>
+    <h1>Wewe Rss Extension Manager</h1>
+    <h3>基础参数</h3>
+    <strong>DB Provider: </strong> {{baseconf['db_provider']}} <br>
+    <strong>DB URL: </strong> {{baseconf['db_url']}} <br>
+    
+    <strong>Default Interval Minutes: </strong> {{baseconf['default_interval_minutes']}}
+    <button type="button" onclick="showEditDefaultInverval()">编辑</button>
+    <div id="edit-form-interval" style="display: none;">
+        <div id="edit-inputs-interval"></div>
+        <button type="button" onclick="submitEditDefaultInverval()">完成</button>
+        <button type="button" onclick="cancelEditDefaultInverval()">取消</button>
+    </div>
+    <h3>Notifier参数</h3>
+    <ul>
+        {% set counter = namespace(value=0) %}
+        {% for notifier in notifiers %}
+            <li>
+                <strong>Name: {{ notifier.name }} - </strong>
+                <strong>class:</strong> {{ notifier.cls }}
+                <strong>interval_minutes:</strong> {{ notifier.interval_minutes }}
+                <button type="button" onclick="location.href='/notifier/del?idx={{ counter.value }}'">删除</button>
+                <button type="button" onclick="showEditNotifier({{ counter.value }}, '{{ notifier.cls }}')">编辑</button>
+                <div id="edit-form-{{ counter.value }}" style="display: none;">
+                    <div id="edit-inputs-{{ counter.value }}"></div>
+                    <button type="button" onclick="submitEditNotifier({{ counter.value }})">完成</button>
+                    <button type="button" onclick="cancelEditNotifier({{ counter.value }})">取消</button>
+                </div>
+            </li>
+            {% set counter.value = counter.value + 1 %}
+        {% endfor %}
+    </ul>
+    <strong>添加 Notifier</strong>
+    <form action="/notifier/add" method="post">
+        <select id="notifier-class" name="cls" required onchange="updateAdditionalInputs(this.value)">
+            {% for cls in notifier_classes %}
+                <option value="{{ cls }}">{{ cls }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="name" placeholder="Notifier Name(cls as default)" style="width: 180px;">
+        <input type="text" name="interval_minutes" placeholder="Interval Minutes(240 as default)" style="width: 200px;">
+        <div id="additional-inputs"></div>
+        <button type="submit">添加</button>
+    </form>
+    <h3>保存</h3>
+    <button id="save-button">保存配置</button>
+    <script>
+        // 检查 URL 中是否有特定的锚点
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('action') && urlParams.get('action') === 'added_notifier') {
+            window.location.reload();
+        }
+
+        document.getElementById('save-button').addEventListener('click', function() {
+            fetch('/save', {method: 'GET'})
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('保存失败');
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert('保存完成');
+            })
+            .catch(error => {
+                console.error('保存时发生错误:', error);
+                alert('保存失败，请重试！');
+            });
+        });
+    </script>
+</body>
+</html>

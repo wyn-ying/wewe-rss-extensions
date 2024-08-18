@@ -44,20 +44,20 @@ services:
 
   extensions:
     image: wynying92/wewe-rss-extensions:latest
+    ports:
+      - 4100:4100
     depends_on:
       db:
         condition: service_healthy
     environment:
-      # 是否启用Notifier，任意非空值视为 启用，空值（ENABLE_NOTIFIER=）视为 不启用
-      - ENABLE_NOTIFIER=1
-      # 数据库连接地址，与app服务的DATABASE_URL保持一致，优先级低于NOTIFIER_CONF_PATH中的db_url
+      # 数据库连接地址，与app服务的DATABASE_URL保持一致，优先级低于CONF_PATH中的db_url
       - DATABASE_URL=mysql://root:123456@db:3306/wewe-rss?schema=public&connect_timeout=30&pool_timeout=30&socket_timeout=30
-      # 数据库类型 mysql/sqlite 与app服务的DATABASE_TYPE保持一致，优先级低于NOTIFIER_CONF_PATH中的db_provider
+      # 数据库类型 mysql/sqlite 与app服务的DATABASE_TYPE保持一致，优先级低于CONF_PATH中的db_provider
       - DATABASE_TYPE=mysql
-      # 所有Notifier默认的通知周期，优先级低于NOTIFIER_CONF_PATH中的default_interval_minutes
+      # 所有Notifier默认的通知周期，优先级低于CONF_PATH中的default_interval_minutes
       - NOTIFY_INTERVAL_MINUTES=240
       # Notifier的配置文件路径
-      - NOTIFIER_CONF_PATH=/app/data/conf/notify.yaml
+      - CONF_PATH=/app/data/conf/conf.yaml
     volumes:
       - ./data/conf:/app/data/conf
     networks:
