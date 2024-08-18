@@ -1,10 +1,16 @@
 # 扩展组件配置
 
+完整示例参考 [conf_example.yaml](https://github.com/wyn-ying/wewe-rss-extensions/blob/main/conf_example.yaml)
+
 v0.2.0支持通过 `http://localhost:4100` 动态配置
 
-## 定时通知机器人配置
+> [!NOTE]
+> v0.2.0支持通过 `http://localhost:4100` 动态配置并保存
+> <br>如需暴露到公网环境，建议在使用页面动态配置后，**保存配置**，停止并移除容器。以docker compose 为例 `docker compose down extensions`
+> <br>之后将容器修改为不对外映射port，再重新创建容器。以docker compose 为例 `docker-compose up -d extensions`
+> <br>重启时会加载已保存的yaml配置文件
 
-完整示例参考 [conf_example.yaml](https://github.com/wyn-ying/wewe-rss-extensions/blob/main/conf_example.yaml)
+## 定时通知机器人配置
 
 ### 基础参数
 
