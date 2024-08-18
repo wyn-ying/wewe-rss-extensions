@@ -28,9 +28,11 @@ extensions主程序启动时，会读取容器 `/app/data/conf` 目录下各组�
 ## 部署
 
 ### Docker Compose
-
-- Mysql版参考 [docker-compose.yml](https://github.com/wyn-ying/wewe-rss-extensions/blob/main/docker-compose.yml)
+1. 参考 [扩展组件配置](https://github.com/wyn-ying/wewe-rss-extensions/blob/main/docs/configuation.md) 完成相关组件的配置，yaml配置文件放在目录 `$(pwd)/data/conf/`
+2. 按需调整 docker compose yaml 文件
 - Sqlite版参考 [docker-compose.sqlite.yml](https://github.com/wyn-ying/wewe-rss-extensions/blob/main/docker-compose.sqlite.yml)
+- Mysql版参考 [docker-compose.yml](https://github.com/wyn-ying/wewe-rss-extensions/blob/main/docker-compose.yml)
+3. 启动 docker compose
 
 > [!NOTE]
 > v0.2.0支持通过 `http://localhost:4100` 动态配置并保存
