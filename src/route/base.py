@@ -12,7 +12,7 @@ base_blueprint = Blueprint('base', __name__, url_prefix='/base')
 
 def get_base(conf) -> dict:
     baseconf = {}
-    for key in ('default_interval_minutes', 'db_provider', 'db_url'):
+    for key in ('default_interval_minutes', 'db_provider', 'db_url', 'wewerss_origin_url'):
         baseconf[key] = conf[key]
     return baseconf
 

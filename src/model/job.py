@@ -7,10 +7,12 @@ from typing import Callable
 from datetime import datetime
 from model.fetcher import DbFetcher
 from model.notifier import BaseNotifier
-from model.conf import logger
+from model.conf import logger, conf
+import requests
+import time
 
 
-def get_runfunc(fetcher: DbFetcher, notifier: BaseNotifier) -> Callable:
+def get_notifier_func(fetcher: DbFetcher, notifier: BaseNotifier) -> Callable:
     def wrapper_func():
         now_minute = datetime.now().replace(second=0, microsecond=0)
         if not notifier.is_active:
@@ -22,4 +24,13 @@ def get_runfunc(fetcher: DbFetcher, notifier: BaseNotifier) -> Callable:
             return
         message = notifier.generate_message(cur_data)
         notifier.send(message)
+    return wrapper_func
+
+
+def get_cron_func(feedid: str) -> Callable:
+    def wrapper_func():
+        ori_url = conf['wewerss_origin_url']
+        url = f'{ori_url}/feeds/{feedid}.json?update=true'
+        _ = requests.get(url)
+        time.sleep(30)
     return wrapper_func

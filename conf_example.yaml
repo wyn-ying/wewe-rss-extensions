@@ -1,18 +1,18 @@
-# [Optional] Notifier默认的通知周期
+# Notifier默认的通知周期
 default_interval_minutes: 240
-# [Optional] 数据库类型，优先级高于环境变量中的DATABASE_TYPE
+# 数据库类型，优先级高于环境变量中的DATABASE_TYPE
 db_provider: sqlite
-# [Optional] 数据库连接地址，优先级高于环境变量中的DATABASE_URL
+# 据库连接地址，优先级高于环境变量中的DATABASE_URL
 db_url: /app/data/wewe-rss.db
-# [Required] Notifiers配置项
+# Notifiers配置项
 notifiers:
   # [Required] 要使用的Notifier类
 - cls: FeishuNotifier
-  # [Optional] 服务启动发送测试消息时，用于确认连通性的Notifier名称，缺省则为cls同名
+  # 服务启动发送测试消息时，用于确认连通性的Notifier名称，缺省则为cls同名
   name: feishu1
-  # [Optional] 本Notifier使用的通知间隔，优先级高于 default_interval_minutes
+  # 本Notifier使用的通知间隔，优先级高于 default_interval_minutes
   interval_minutes: 10
-  # [Required] Notifier特定参数
+  # [Required] FeishuNotifier特定参数
   fs_token: xxxx
 - cls: FeishuNotifier
   # name: feishu2
@@ -20,6 +20,17 @@ notifiers:
   fs_token: yyyy
 - cls: DingtalkNotifier
   name: dingtalk1
+  # [Required] DingtalkNotifier特定参数
   access_token: xxxx
+  # [Required] DingtalkNotifier特定参数
   secret: xxxx
   # interval_minutes: 60
+# WeWe Rss的源url
+wewerss_origin_url: http://127.0.0.1:4000
+# Cron配置项
+crons:
+  MP_WXS_123:
+  - 45 22 * * 1-5
+  - 20 18 * * 6
+  MP_WXS_456:
+  - 5 9 * * 1-5

@@ -23,6 +23,8 @@ services:
     volumes:
       # 映射数据库文件存储位置，容器重启后不丢失
       - ./data:/app/data
+    networks:
+      wewe-rss:
 
   extensions:
     image: wynying92/wewe-rss-extensions:latest
@@ -31,13 +33,24 @@ services:
     depends_on:
       - app
     environment:
+      # 是否启用Notifier，任意非空值视为 启用，空值（ENABLE_NOTIFIER=）视为 不启用
+      - ENABLE_NOTIFIER=1
       # 数据库连接地址，与app服务的DATABASE_URL保持一致，优先级低于CONF_PATH中的db_url
       - DATABASE_URL=file:../data/wewe-rss.db
       # 数据库类型 mysql/sqlite 与app服务的DATABASE_TYPE保持一致，优先级低于CONF_PATH中的db_provider
       - DATABASE_TYPE=sqlite
       # 所有Notifier默认的通知周期，优先级低于CONF_PATH中的default_interval_minutes
       - NOTIFY_INTERVAL_MINUTES=240
+      # 是否启用Cron，任意非空值视为 启用，空值（ENABLE_CRON=）视为 不启用
+      - ENABLE_CRON=1
+      # wewe-rss源地址
+      - WEWERSS_ORIGIN_URL=http://app:4000
       # Notifier的配置文件路径
       - CONF_PATH=/app/data/conf/conf.yaml
     volumes:
       - ./data:/app/data
+    networks:
+      wewe-rss:
+
+networks:
+  wewe-rss:

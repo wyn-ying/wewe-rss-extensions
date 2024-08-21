@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Wewe Rss Extension Manager</title>
     <script src="/static/js/index.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='ico.png') }}">
 </head>
 <body>
     <h1>Wewe Rss Extension Manager</h1>
@@ -18,7 +20,7 @@
         <button type="button" onclick="submitEditDefaultInverval()">完成</button>
         <button type="button" onclick="cancelEditDefaultInverval()">取消</button>
     </div>
-    <h3>Notifier参数</h3>
+    <h3>Notifier参数{{ notifier_disable_info }}</h3>
     <ul>
         {% set counter = namespace(value=0) %}
         {% for notifier in notifiers %}
@@ -47,6 +49,32 @@
         <input type="text" name="name" placeholder="Notifier Name(cls as default)" style="width: 180px;">
         <input type="text" name="interval_minutes" placeholder="Interval Minutes(240 as default)" style="width: 200px;">
         <div id="additional-inputs"></div>
+        <button type="submit">添加</button>
+    </form>
+    <h3>Cron参数{{ cron_disable_info }}</h3>
+    <ul>
+        {% for fid, crons in feedcron.items() %}
+        <li>
+            <strong>Feed Id:</strong> {{ fid }} <strong>公众号名称: </strong> {{ feedid2name.get(fid) }}
+            {% set cnt = namespace(v=0) %}
+            {% for cron_expr in crons %}
+                <div class="lvl2">
+                    <strong>- Cron:</strong> {{ cron_expr }}
+                    <button type="button" onclick="location.href='/cron/del?idx={{ cnt.v }}&fid={{ fid }}'">删除</button>
+                </div>
+                {% set cnt.v = cnt.v + 1 %}
+            {% endfor %}
+        </li>
+        {% endfor %}
+    </ul>
+    <strong>添加 Cron</strong>
+    <form action="/cron/add" method="post">
+        <select id="feed-id" name="fid" required>
+            {% for feedid, name in feedid2name.items() %}
+                <option value="{{ feedid }}">{{feedid}} -- {{ name }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="cron_expression" placeholder="for examle 0 9 * * 1-5" required>
         <button type="submit">添加</button>
     </form>
     <h3>保存</h3>
