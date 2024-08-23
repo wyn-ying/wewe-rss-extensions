@@ -67,6 +67,8 @@ def delete_cron():
     cron_idx = request.args.get('idx', type=int)
     cron = feedcron[feedid]
     cron.pop(cron_idx)
+    if len(cron) == 0:
+        feedcron.pop(feedid)
     return redirect(url_for('index', _anchor='deleted_cron'))
     # return jsonify({'status': 'success', 'message': 'Cron deleted'})
 
