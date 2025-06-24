@@ -135,9 +135,9 @@ class DbFetcher:
                     "id": i + 1,  # 生成一个简单的ID
                     "title": r[0],
                     "pic_url": r[1],
-                    "created_at": int(r[3]),
-                    "publish_time": r[4],
-                    "mp_name": r[5]
+                    "created_at": int(r[2]),
+                    "publish_time": r[3],
+                    "mp_name": r[4]
                 } for i, r in enumerate(results)]
         else:
             data = [
