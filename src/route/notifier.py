@@ -12,28 +12,28 @@ from route.base import baseconf
 from model.fetcher import get_fetcher
 from model import notifier as notifier
 from model.notifier import BaseNotifier
-from model.job import get_runfunc
+from model.job import get_notifier_func
 import copy
 import easycron
 
 notifier_blueprint = Blueprint('notifier', __name__, url_prefix='/notifier')
-__idx2notifierfunc: Dict[int, Callable] = {}
+__notifieridx2func: Dict[int, Callable] = {}
 
 
 def register(notifier: BaseNotifier, notifier_idx: int) -> None:
     fetcher = get_fetcher(baseconf)
-    func = get_runfunc(fetcher, notifier)
+    func = get_notifier_func(fetcher, notifier)
     minutes = notifier.interval_minutes
     easycron.register(func, interval=timedelta(minutes=minutes))
-    __idx2notifierfunc[notifier_idx] = func
+    __notifieridx2func[notifier_idx] = func
 
 
 def cancel(notifier_idx: int) -> None:
-    func = __idx2notifierfunc.pop(notifier_idx)
+    func = __notifieridx2func.pop(notifier_idx)
     easycron.cancel(func)
 
 
-def get_notifiers(conf: dict, default_interval: int) -> List[BaseNotifier]:
+def init_notifiers(conf: dict, default_interval: int) -> List[BaseNotifier]:
     notifiers_conf: list = conf.get('notifiers', [])
     notifiers: List[BaseNotifier] = []
     for notifier_conf in notifiers_conf:
@@ -60,7 +60,7 @@ def get_notifiers(conf: dict, default_interval: int) -> List[BaseNotifier]:
 
 
 default_interval = baseconf['default_interval_minutes']
-notifiers: List[BaseNotifier] = get_notifiers(conf, default_interval)
+notifiers: List[BaseNotifier] = init_notifiers(conf, default_interval)
 
 
 @notifier_blueprint.route('/add', methods=['POST'])

@@ -100,8 +100,8 @@ class FeishuNotifier(BaseNotifier):
             tk = kwargs['fs_token']
             self.__fs_token = tk
             self.url = f'https://open.feishu.cn/open-apis/bot/v2/hook/{tk}'
-            title = 'WeWe RSS Notifier 连接测试'
-            content = f'Wewe Rss Notifier **[{self.name}]** 配置成功'
+            title = 'RSS Notifier 连接测试'
+            content = f'Rss Notifier **[{self.name}]** 配置成功'
             message = self._gen_markdown_message(title, content)
             self.send(message)
 
@@ -196,8 +196,8 @@ class DingtalkNotifier(BaseNotifier):
             self.xiaoding = DingtalkChatbot(self.url, secret=secret,
                                             pc_slide=True, fail_notice=False)
             message = {
-                'title': 'WeWe RSS Notifier 连接测试',
-                'text': f'Wewe Rss Notifier **[{self.name}]** 配置成功',
+                'title': 'RSS Notifier 连接测试',
+                'text': f'Rss Notifier **[{self.name}]** 配置成功',
             }
             self.send(message)
 

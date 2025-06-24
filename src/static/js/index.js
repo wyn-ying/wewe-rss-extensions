@@ -1,5 +1,4 @@
 function updateAdditionalInputs(cls) {
-    const nameInput = document.querySelector('input[name="name"]');
     const additionalInputsContainer = document.getElementById('additional-inputs');
 
     additionalInputsContainer.innerHTML = '';

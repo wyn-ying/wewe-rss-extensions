@@ -44,8 +44,26 @@ class DbFetcher:
                 ORDER BY a.publish_time DESC;
                 """
             self.db_timezone_bias = 0
+        elif provider == 'zlz':
+            parsed_url = urlparse(self.url)
+            self.db = parsed_url.path[1:]
+            self.conn_args = {
+                'host': parsed_url.hostname,
+                'port': parsed_url.port,
+                'user': parsed_url.username,
+                'password': parsed_url.password,
+                'database': self.db
+            }
+            # 参考 rss_loader.py 的查询逻辑，查询 cnvp_mp_articles 表
+            self.query_template = """
+                SELECT title, links as pic_url, UNIX_TIMESTAMP(publish_time), publish_time, wsx_id as mp_name
+                FROM cnvp_mp_articles
+                WHERE publish_time >= DATE_SUB(NOW(), INTERVAL {timebias} MINUTE)
+                ORDER BY publish_time DESC
+                """
+            self.db_timezone_bias = 0
         else:
-            raise ValueError('provider should be in ("mysql", "sqlite")')
+            raise ValueError('provider should be in ("mysql", "sqlite", "zlz")')
         self.inited = False
 
     def check_initialized(self) -> bool:
@@ -53,6 +71,8 @@ class DbFetcher:
             handler = mysql.connector.connect(**self.conn_args)
         elif self.provider == 'sqlite':
             handler = sqlite3.connect(self.url)
+        elif self.provider == 'zlz':
+            handler = mysql.connector.connect(**self.conn_args)
 
         cursor = handler.cursor()
         if self.provider == 'mysql':
@@ -74,7 +94,19 @@ class DbFetcher:
                 table_exists = cursor.fetchone() is not None
                 if not table_exists:
                     return False
+        elif self.provider == 'zlz':
+            check_table_query = """
+                SELECT COUNT(*)
+                FROM information_schema.tables
+                WHERE table_schema = %s
+                AND table_name = %s;
+            """
+            cursor.execute(check_table_query, (self.db, 'cnvp_mp_articles'))
+            table_exists = cursor.fetchone()[0] > 0
+            if not table_exists:
+                return False
 
+        handler.close()
         return True
 
     def get_recent_data(self, minutes: int = 240) -> list:
@@ -89,25 +121,43 @@ class DbFetcher:
             handler = mysql.connector.connect(**self.conn_args)
         elif self.provider == 'sqlite':
             handler = sqlite3.connect(self.url)
+        elif self.provider == 'zlz':
+            handler = mysql.connector.connect(**self.conn_args)
+            
         cursor = handler.cursor()
         cursor.execute(query)
         results = cursor.fetchall()
-        data = [
-            {
-                "id": r[0],
-                "title": r[1],
-                "pic_url": r[2],
-                "created_at": int(r[3]),
-                "publish_time": r[4],
-                "mp_name": r[5]
-            } for r in results]
+        
+        if self.provider == 'zlz':
+            # 对于 zlz provider，需要生成ID并适配数据结构
+            data = [
+                {
+                    "id": i + 1,  # 生成一个简单的ID
+                    "title": r[0],
+                    "pic_url": r[1],
+                    "created_at": int(r[3]),
+                    "publish_time": r[4],
+                    "mp_name": r[5]
+                } for i, r in enumerate(results)]
+        else:
+            data = [
+                {
+                    "id": r[0],
+                    "title": r[1],
+                    "pic_url": r[2],
+                    "created_at": int(r[3]),
+                    "publish_time": r[4],
+                    "mp_name": r[5]
+                } for r in results]
+        
+        handler.close()
         return data
 
 
 def get_fetcher(conf: dict) -> Union[DbFetcher, None]:
     provider = conf['db_provider']
-    if provider not in ('mysql', 'sqlite'):
-        logger.warning('EXIT NOTIFIER: config of "db_provider" should be in ("mysql", "sqlite")')
+    if provider not in ('mysql', 'sqlite', 'zlz'):
+        logger.warning('EXIT NOTIFIER: config of "db_provider" should be in ("mysql", "sqlite", "zlz")')
         return None
     url = conf['db_url']
     db_fetcher = DbFetcher(provider, url)
