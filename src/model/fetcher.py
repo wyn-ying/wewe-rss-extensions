@@ -56,7 +56,7 @@ class DbFetcher:
             }
             # 参考 rss_loader.py 的查询逻辑，查询 cnvp_mp_articles 表
             self.query_template = """
-                SELECT title, links as pic_url, UNIX_TIMESTAMP(publish_time), publish_time, wsx_id as mp_name
+                SELECT title, links as pic_url, UNIX_TIMESTAMP(publish_time), publish_time, wxs_id as mp_name
                 FROM cnvp_mp_articles
                 WHERE publish_time >= DATE_SUB(NOW(), INTERVAL {timebias} MINUTE)
                 ORDER BY publish_time DESC
