@@ -28,7 +28,7 @@ notifiers:
   secret: xxxx
   # interval_minutes: 60
 # WeWe Rss的源url
-wewerss_origin_url: http://127.0.0.1:4000
+wewerss_origin_url: http://127.0.0.1:10082
 # Cron配置项
 crons:
   MP_WXS_123:
