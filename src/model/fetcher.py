@@ -56,10 +56,14 @@ class DbFetcher:
             }
             # 参考 rss_loader.py 的查询逻辑，查询 cnvp_mp_articles 表
             self.query_template = """
-                SELECT title, links as pic_url, UNIX_TIMESTAMP(publish_time), publish_time, wxs_id as mp_name
-                FROM cnvp_mp_articles
-                WHERE publish_time >= DATE_SUB(NOW(), INTERVAL {timebias} MINUTE)
-                ORDER BY publish_time DESC
+                SELECT a.original_id, a.title, a.links as pic_url,
+                    UNIX_TIMESTAMP(CONVERT_TZ(a.publish_time, '+08:00', '+00:00')),
+                    UNIX_TIMESTAMP(CONVERT_TZ(a.publish_time, '+08:00', '+00:00')),
+                    b.mp_name
+                FROM cnvp_mp_articles AS a, cnvp_feeds as b
+                WHERE a.wxs_id = b.wxs_id
+                AND a.publish_time - INTERVAL 480 MINUTE >= NOW() - INTERVAL {timebias} MINUTE
+                ORDER BY a.publish_time DESC
                 """
             self.db_timezone_bias = 0
         else:
@@ -132,12 +136,12 @@ class DbFetcher:
             # 对于 zlz provider，需要生成ID并适配数据结构
             data = [
                 {
-                    "id": i + 1,  # 生成一个简单的ID
-                    "title": r[0],
-                    "pic_url": r[1],
-                    "created_at": int(r[2]),
-                    "publish_time": r[3],
-                    "mp_name": r[4]
+                    "id": r[0],
+                    "title": r[1],
+                    "pic_url": r[2],
+                    "created_at": int(r[3]),
+                    "publish_time": int(r[4]),
+                    "mp_name": r[5]
                 } for i, r in enumerate(results)]
         else:
             data = [
